@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Invalid Link</h2>
+<p>This reset link is invalid or expired.</p>
+<a href="{% url 'donor_forget_reset' %}">Try Again</a>
+{% endblock %}

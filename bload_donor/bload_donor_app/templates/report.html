@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/donation_reports.css' %}">
+<div class="container mt-5">
+    <h2>📊 Donation Reports</h2>
+    <hr>
+
+    <form method="get" class="row g-3 mb-4">
+        <div class="col-md-4">
+            <label for="month" class="form-label">Filter by Month</label>
+            <input type="month" class="form-control" id="month" name="month" value="{{ request.GET.month }}">
+        </div>
+        <div class="col-md-4">
+            <label for="blood_type" class="form-label">Filter by Blood Type</label>
+            <select class="form-select" id="blood_type" name="blood_type">
+                <option value="">All</option>
+                {% for type, _ in blood_types %}
+                <option value="{{ type }}" {% if request.GET.blood_type == type %}selected{% endif %}>{{ type }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
+        </div>
+    </form>
+
+    <div class="report-summary">
+        <p><strong>Total Donations:</strong> {{ total_donations }}</p>
+        <p><strong>Unique Donors:</strong> {{ donor_list|length }}</p>
+    </div>
+
+    <div class="report-section mt-4">
+        <h4>Donations by Blood Type</h4>
+        <table class="table table-striped mt-3">
+            <thead>
+                <tr>
+                    <th>Blood Type</th>
+                    <th>Donations</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in donation_counts %}
+                <tr>
+                    <td>{{ item.donor__blood_type }}</td>
+                    <td>{{ item.count }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="2">No donations found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="d-flex justify-content-end mb-3">
+            <a href="{% url 'export_report_csv' %}?month={{ request.GET.month }}&blood_type={{ request.GET.blood_type }}" class="btn btn-outline-success me-2">Export CSV</a>
+            <a href="{% url 'export_report_pdf' %}?month={{ request.GET.month }}&blood_type={{ request.GET.blood_type }}" class="btn btn-outline-danger">Export PDF</a>
+        </div>
+    </div>
+
+    <div class="report-section mt-5">
+        <h4>Donor Details</h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Blood Type</th>
+                    <th>Email</th>
+                    <th>Last Appointment</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for donor in donor_list %}
+                <tr>
+                    <td>{{ donor.first_name }} {{ donor.last_name }}</td>
+                    <td>{{ donor.blood_type }}</td>
+                    <td>{{ donor.email }}</td>
+                    <td>{{ donor.last_appointment|date:"Y-m-d" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4">No donor records available.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

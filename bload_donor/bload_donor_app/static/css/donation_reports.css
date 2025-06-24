@@ -1,0 +1,366 @@
+/* donation_reports.css */
+
+/* Color variables for consistency (if not already loaded from a global CSS) */
+:root {
+    --primary: #e74c3c;
+    --secondary: #c0392b;
+    --accent: #f39c12;
+    --light: #ecf0f1;
+    --dark: #2c3e50;
+    --success: #27ae60; /* Used for success buttons/alerts */
+    --warning: #f1c40f;
+    --primary-blue: #2d3e50;
+    --primary-red: #e74c3c;
+    --light-red: #f3a59e;
+    --orange-alert: #f39c12;
+    --text-dark: #2c3e50;
+    --text-light: #ffffff;
+    --gray-bg: #f5f5f5;
+    --border-gray: #ddd;
+}
+
+/* Basic body styling (assuming base.html might define this, but good for standalone testing) */
+body {
+    background-color: var(--gray-bg);
+    color: var(--text-dark);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    /* --- NEW: Flexbox for centering the main content block --- */
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: flex-start; /* Align to the top vertically, to prevent it from stretching to full height */
+    min-height: 100vh; /* Ensure it takes full viewport height for centering */
+    padding-top: 50px; /* Add some top padding to push content down if navbar isn't fixed */
+    padding-bottom: 50px; /* Add some bottom padding */
+    box-sizing: border-box; /* Include padding in height calculation */
+}
+
+/* Main container for the reports page */
+.container.mt-5 {
+    background-color: var(--text-light); /* White background for the main content area */
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    max-width: 900px; /* Adjust max-width as suitable for reports */
+    /* Remove specific margin-top/bottom here as body flexbox handles overall positioning */
+    margin: 0; /* Reset margins since parent body handles centering */
+    width: 100%; /* Ensure it takes available width up to max-width */
+    box-sizing: border-box;
+}
+
+/* Page Title */
+.container.mt-5 h2 {
+    font-size: 32px;
+    color: var(--primary-blue);
+    margin-bottom: 20px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Space between icon and text */
+}
+
+/* Icon next to title (if you add one, e.g., <span class="title-icon">📊</span>) */
+.container.mt-5 h2 .title-icon {
+    font-size: 1.2em; /* Slightly larger icon */
+    color: var(--accent); /* Use an accent color for the icon */
+}
+
+/* Horizontal Rule */
+.container.mt-5 hr {
+    border: none;
+    border-top: 1px solid var(--border-gray);
+    margin-top: 0;
+    margin-bottom: 30px;
+}
+
+/* --- Filter Form Styling --- */
+.row.g-3.mb-4 {
+    display: flex; /* Makes it a flex container for columns */
+    flex-wrap: wrap; /* Allows columns to wrap on smaller screens */
+    gap: 15px; /* Space between form columns/elements */
+    margin-bottom: 30px; /* Space below the filter form */
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-gray); /* Separator below filters */
+}
+
+.col-md-4 {
+    flex: 1 1 calc(33.333% - 15px); /* Mimics Bootstrap col-md-4 with gap */
+    max-width: calc(33.333% - 15px);
+    box-sizing: border-box;
+}
+
+.form-label { /* Styling for labels within the form */
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-dark);
+    font-size: 16px;
+}
+
+.form-control,
+.form-select { /* Styling for input and select fields */
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--border-gray);
+    border-radius: 8px;
+    font-size: 16px;
+    color: var(--text-dark);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    box-sizing: border-box;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-red);
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2);
+    outline: none;
+}
+
+.d-flex.align-items-end {
+    display: flex;
+    align-items: flex-end; /* Aligns content (button) to the bottom of its column */
+}
+
+/* --- Report Summary Section --- */
+.report-summary {
+    background-color: var(--light); /* Light background for summary */
+    padding: 20px 25px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-around; /* Distribute items evenly */
+    gap: 20px; /* Space between summary items */
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+.report-summary p {
+    margin: 0;
+    font-size: 18px;
+    color: var(--text-dark);
+}
+
+.report-summary p strong {
+    color: var(--primary-red); /* Highlight key numbers */
+}
+
+/* --- Report Sections (Donations by Blood Type & Donor Details) --- */
+.report-section.mt-4,
+.report-section.mt-5 {
+    margin-top: 40px !important; /* Consistent spacing */
+    /* Adjust for mt-5 if needed, but 40px seems consistent with your other designs */
+}
+
+.report-section h4 {
+    font-size: 24px;
+    color: var(--primary-blue);
+    margin-bottom: 20px;
+    font-weight: 600;
+    border-bottom: 2px solid var(--border-gray); /* Subtle underline */
+    padding-bottom: 10px;
+}
+
+/* --- Table Styling (Common for both tables) --- */
+.table.table-striped,
+.table.table-bordered { /* Apply common table styles */
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px !important; /* Consistent spacing */
+    margin-bottom: 30px; /* Space below table */
+    border-radius: 8px;
+    overflow: hidden; /* Ensures border-radius applies to table corners */
+}
+
+.table.table-striped th,
+.table.table-striped td,
+.table.table-bordered th,
+.table.table-bordered td { /* Apply to both types of tables */
+    padding: 15px;
+    text-align: left;
+    border: 1px solid var(--border-gray); /* Explicit border for all cells */
+}
+
+.table.table-striped thead th,
+.table.table-bordered thead th { /* Apply to both types of table headers */
+    background-color: var(--primary-blue); /* Header background */
+    color: var(--text-light); /* Header text color */
+    font-weight: bold;
+    font-size: 16px;
+    text-transform: uppercase;
+}
+
+.table.table-striped tbody tr:nth-child(odd) {
+    background-color: var(--light); /* Stripe effect for striped tables */
+}
+
+/* For bordered tables, ensure a uniform background if no striping is desired */
+.table.table-bordered tbody tr {
+    background-color: var(--text-light); /* Solid white background for bordered tables by default */
+}
+
+
+.table.table-striped tbody tr:hover,
+.table.table-bordered tbody tr:hover {
+    background-color: rgba(231, 76, 60, 0.05); /* Light red hover effect for both tables */
+}
+
+.table.table-striped tbody td,
+.table.table-bordered tbody td {
+    color: var(--text-dark);
+    font-size: 15px;
+}
+
+.table.table-striped tbody tr:last-child td,
+.table.table-bordered tbody tr:last-child td {
+    border-bottom: none; /* No border for the last row */
+}
+
+/* No data message in table */
+.table.table-striped tbody tr td[colspan="2"],
+.table.table-bordered tbody tr td[colspan="4"] { /* Adjust colspan for donor details table */
+    text-align: center;
+    font-style: italic;
+    color: #888;
+    padding: 20px;
+}
+
+/* --- Export Buttons --- */
+.d-flex.justify-content-end.mb-3 {
+    display: flex;
+    justify-content: flex-end; /* Aligns items to the right */
+    gap: 15px; /* Space between buttons */
+    margin-bottom: 30px !important; /* Consistent spacing below buttons */
+    padding-top: 10px; /* Space above buttons if they follow table */
+}
+
+.btn-primary { /* General primary button style, used by Apply Filters */
+    background-color: var(--primary-red);
+    color: var(--text-light);
+    border: none;
+    padding: 12px 25px; /* Slightly adjusted padding for buttons */
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    text-decoration: none; /* Ensure anchor tags look like buttons */
+    display: inline-block; /* For buttons that are anchors */
+}
+
+.btn-primary:hover {
+    background-color: var(--secondary);
+    transform: translateY(-2px);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+
+.btn-outline-success {
+    background-color: transparent;
+    border: 1px solid var(--success);
+    color: var(--success);
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-success:hover {
+    background-color: var(--success);
+    color: var(--text-light);
+    transform: translateY(-2px);
+}
+
+.btn-outline-danger {
+    background-color: transparent;
+    border: 1px solid var(--primary-red);
+    color: var(--primary-red);
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-danger:hover {
+    background-color: var(--primary-red);
+    color: var(--text-light);
+    transform: translateY(-2px);
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+    .container.mt-5 {
+        padding: 30px 20px;
+    }
+    .container.mt-5 h2 {
+        font-size: 28px;
+        gap: 10px;
+    }
+    /* Filter form responsive adjustments */
+    .row.g-3.mb-4 {
+        flex-direction: column; /* Stack filter items vertically */
+        align-items: stretch; /* Make them full width */
+        gap: 20px; /* Space between stacked filters */
+    }
+    .col-md-4 {
+        flex: 1 1 100%; /* Make columns full width */
+        max-width: 100%;
+    }
+    /* Button within the filter form column */
+    .col-md-4 .btn-primary {
+        width: 100%; /* Make button full width */
+        margin-top: 10px; /* Space if needed from above element */
+    }
+
+    .report-summary {
+        flex-direction: column; /* Stack summary items */
+        align-items: center; /* Center them when stacked */
+        gap: 15px;
+        padding: 15px 20px;
+    }
+    .report-summary p {
+        font-size: 16px;
+    }
+    .report-section h4 {
+        font-size: 20px;
+    }
+    /* Table cells for smaller screens */
+    .table.table-striped th,
+    .table.table-striped td,
+    .table.table-bordered th,
+    .table.table-bordered td {
+        padding: 12px;
+        font-size: 14px;
+    }
+    .d-flex.justify-content-end.mb-3 {
+        flex-direction: column; /* Stack buttons */
+        align-items: stretch; /* Make buttons full width */
+        gap: 10px;
+    }
+    .btn-outline-success,
+    .btn-outline-danger {
+        font-size: 14px;
+        padding: 10px 15px;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .container.mt-5 {
+        padding: 20px 15px;
+    }
+    .container.mt-5 h2 {
+        font-size: 24px;
+    }
+    .form-control, .form-select, .btn-primary, .btn-outline-success, .btn-outline-danger {
+        font-size: 15px;
+        padding: 10px;
+    }
+}
