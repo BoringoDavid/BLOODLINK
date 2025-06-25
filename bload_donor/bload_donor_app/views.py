@@ -483,9 +483,7 @@ def donor_forget_reset(request):
             donor.reset_token = token
             donor.save()
 
-            reset_link = request.build_absolute_uri(
-                reverse('reset_donor_password', args=[token])
-            )
+            reset_link = f"{settings.SITE_URL}{reverse('reset_donor_password', args=[token])}"
 
             print("Generated link:", reset_link)  # ✅ Debug log
 

@@ -1,5 +1,3 @@
-
-
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -15,10 +13,11 @@ SECRET_KEY = 'django-insecure-ccdj(556!v#h*g#!q#ig+r4x7i5ail%$#(qa430s($l8@qi7c%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['bloodlink.memiserve.com', '127.0.0.1', 'localhost', '*', '0.0.0.0']
+
 # settings.py
 
-SITE_URL = "http://127.0.0.1:8000"
+SITE_URL = "https://bloodlink.memiserve.com"
 
 # from django.urls import reverse_lazy
 # LOGIN_URL = reverse_lazy('collector_login')
@@ -156,7 +155,15 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_SAVE_EVERY_REQUEST = False
 
 # Use secure cookie in production (HTTPS only)
-SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
+SESSION_COOKIE_SECURE = False if DEBUG else True  # Set to True in production with HTTPS
+
+# Security settings for production
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True if not DEBUG else False
+SECURE_HSTS_PRELOAD = True if not DEBUG else False
 
 #=======================settings for the email sending========================================
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -171,3 +178,7 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 # AUTH_USER_MODEL = 'yourapp.Collector'
 # AUTH_USER_MODEL = 'bload_donor_app.Collector'  # Uncomment if using custom user model
 # AUTH_USER_MODEL = 'bload_donor_app.Donor'  # Uncomment if using custom user model
+
+CSRF_COOKIE_SECURE = False if DEBUG else True
+CSRF_TRUSTED_ORIGINS = ['https://bloodlink.memiserve.com']
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
