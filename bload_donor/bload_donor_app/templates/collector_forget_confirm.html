@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="password-set-container">
+    {% if validlink %}
+        <h2>Set New Password</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <label for="password1">New Password</label>
+            <input type="password" name="password1" id="password1" required>
+
+            <label for="password2">Confirm New Password</label>
+            <input type="password" name="password2" id="password2" required>
+
+            <button type="submit">Reset Password</button>
+        </form>
+    {% else %}
+        <h2>Password reset link invalid</h2>
+        <p>The password reset link is invalid or has expired. Please request a new link.</p>
+        <a href="{% url 'collector_forget_request' %}">Request new password reset</a>
+    {% endif %}
+
+    {% if messages %}
+    <ul>
+        {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</div>
+{% endblock %}

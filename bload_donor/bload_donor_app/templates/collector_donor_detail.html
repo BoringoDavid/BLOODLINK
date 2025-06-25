@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static%}
+{% load humanize %}
+{% load custom_filters %}
+
+{% block title %}BLOODLINK -donor details{% endblock %}
+
+{% block content %}
+<!-- Button -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal1">
+  See Details
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="detailsModal1" tabindex="-1" aria-labelledby="detailsModal1Label" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="detailsModal1Label">Donor Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- donor info -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

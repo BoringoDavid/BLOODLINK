@@ -37,9 +37,11 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .forms import TestimonialForm
 from .models import Donor
+from django.conf import settings 
+from functools import wraps
+from .tokens import donor_password_reset_token 
 
 # handling the loggin sessions using custom user 
-from functools import wraps
 
 # this is collector login
 def collector_login_required(view_func):
@@ -54,55 +56,16 @@ def urgency_banner(request):
     banner = UrgencyBanner.objects.filter(is_active=True).first()
     return {'urgency_banner': banner}
 
-# def index(request):
-#     current_year = date.today().year
-
-#     # ➤ 1. Donors aged 18–25 who made appointments in current year
-#     donors_with_appointments = Donor.objects.filter(
-#         dob__isnull=False,
-#         appointments__appointment_date__year=current_year
-#     )
-
-#     youth_donor_count = sum([
-#         18 <= (current_year - donor.dob.year) <= 25 for donor in donors_with_appointments
-#     ])
-
-#     # ➤ 2. Total appointments this year
-#     appointment_count = DonationAppointment.objects.filter(
-#         appointment_date__year=current_year
-#     ).count()
-
-#     # ➤ 3. Donors registered (based on dob year or date joined)
-#     donor_registered_count = Donor.objects.filter(
-#         dob__year=current_year
-#     ).count()
-
-#     context = {
-#         'faqs': FAQ.objects.all(),
-#         'testimonials': Testimonial.objects.all(),
-#         'youth_count': youth_donor_count,
-#         'appointment_count': appointment_count,
-#         'donor_registered_count': donor_registered_count,
-#         'current_year': current_year,
-#     }
-
-#     return render(request, 'index.html', context)
-
 def index(request):
     current_year = datetime.now().year
 
-    # Total donors registered this year (using date_joined)
     donors_registered_this_year = Donor.objects.filter(date_joined__year=current_year).count()
 
-    # Total donation appointments done this year
     appointments_this_year = DonationAppointment.objects.filter(appointment_date__year=current_year).count()
 
-    # Donors aged 18-25 who had donation appointments in current year
     from django.db.models import F
     from datetime import date
 
-    # Calculate age dynamically: current year - birth year
-    # Filter donors between age 18 and 25 who had appointments this year
     young_donors_appointments = DonationAppointment.objects.filter(
         appointment_date__year=current_year,
         donor__dob__isnull=False
@@ -123,11 +86,7 @@ def index(request):
 
 @login_required
 def submit_testimonial(request):
-    # Get the donor linked to the logged-in user
-    # Assuming your auth user is linked to Donor in some way
-    # For example, if you have a OneToOne field user -> donor or
-    # if donor's username matches request.user.username
-
+    
     try:
         donor = Donor.objects.get(username=request.user.username)
     except Donor.DoesNotExist:
@@ -369,12 +328,8 @@ def donor(request):
         'testimonial_success': success,
     }
     return render(request, 'donor.html', context)
-
 #============================================end of donor view==============================================
-
 #=======================================scheduling appointment view========================================================
-
-
 @require_POST
 def schedule_appointment(request):
     try:
@@ -443,7 +398,7 @@ def schedule_appointment(request):
                 f"Location Details: {nearest_collector.district}, {nearest_collector.province}\n\n"
                 f"You will be notified of any changes to your scheduled appointment.\n\n"
                 f"We appreciate your contribution to saving lives!\n\n"
-                f"Sincerely,\nRBC Blood Donation Team"
+                f"Sincerely,\nblood link Blood Donation Team"
             )
             from_email = 'dboringo3@gmail.com'
             recipient_list = [donor.email]
@@ -663,7 +618,6 @@ from django.shortcuts import render, get_object_or_404
 from django.db.models import Count, Max
 from django.db.models.functions import TruncMonth
 from datetime import date, timedelta
-import numpy as np
 
 from bload_donor_app.models import Collector, DonationDrive, Donor, DonationAppointment
 from bload_donor_app.ml_model.predictor import predict_donation
@@ -780,11 +734,12 @@ def collector(request):
         ).values('donor').distinct().count()
         blood_inventory[blood_type] = recent_count
 
-    recent_donors = Donor.objects.filter(appointments__appointment_date__isnull=False).order_by('-appointments__appointment_date').distinct()[:5]
+        recent_donors = Donor.objects.filter(appointments__appointment_date__isnull=False).order_by('-appointments__appointment_date').distinct()[:5]
+
 
     initials = ''.join([name[0] for name in collector.contact_person.split()[:2]]).upper() if collector.contact_person else ''
     full_name = f"{collector.contact_person}" if collector.contact_person else ''
-    user_role = "RBC Collector"
+    user_role = "blood link Collector"
 
     zipped_donation_data = zip(month_labels, donation_chart_data)
 
@@ -854,7 +809,6 @@ def edit_drive(request, drive_id):
         form = DonationDriveForm(instance=drive)
 
     return render(request, 'edit_drive.html', {'form': form, 'drive': drive})
-
 
 #==========================================message donors on particular donor drive============================
 from django.core.mail import send_mass_mail
@@ -966,7 +920,7 @@ from django.shortcuts import render, redirect
 from .models import Donor  # adjust this if needed
 from django.contrib.auth import update_session_auth_hash
 
-def settings(request):
+def settingsdonor(request):
     if not request.session.get('donor_id'):
         return redirect('donor_login')  # Adjust to your login URL name
 
@@ -997,7 +951,7 @@ def settings(request):
                 update_session_auth_hash(request, donor)  # Keeps user logged in
                 messages.success(request, 'Password updated successfully.')
 
-        return redirect('settings')  # reload page to avoid resubmission
+        return redirect('settingsdonor')  # reload page to avoid resubmission
 
     return render(request, 'settings.html', {'donor': donor})
 
@@ -1269,3 +1223,169 @@ def export_report_pdf(request):
         return HttpResponse('Error generating PDF', status=500)
 
     return response
+
+#=================== new elements added on the  collector dashoboard ============================
+#===========================donor details=======================================================
+def donor_detail_view(request, donor_id):
+    donor = get_object_or_404(Donor, id=donor_id)
+    return render(request, 'collector_donor_detail.html', {'donor': donor})
+#=================================donor sending message================================================
+@csrf_exempt
+def send_message_form(request, donor_id):
+    donor = get_object_or_404(Donor, id=donor_id)
+
+    if request.method == 'POST':
+        message = request.POST.get('message', '')
+
+        if message:
+            send_mail(
+                subject="Message from blood link Collector",
+                message=message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[donor.email],
+                fail_silently=False,
+            )
+            messages.success(request, 'Message sent successfully.')
+            return redirect('collector')
+        else:
+            messages.error(request, 'Message cannot be empty.')
+
+    return render(request, 'send_message_form.html', {'donor': donor})
+
+#===================================working on forget password section===============================
+
+
+token_generator = PasswordResetTokenGenerator()
+def donor_forget_request(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        try:
+            donor = Donor.objects.get(email=email)
+        except Donor.DoesNotExist:
+            messages.error(request, "Email address not found.")
+            return redirect("donor_forget_request")
+
+        # Generate reset token and uid
+        token = donor_password_reset_token.make_token(donor)  
+        uid = urlsafe_base64_encode(force_bytes(donor.pk))
+
+
+        # Build reset URL
+        reset_url = request.build_absolute_uri(
+            reverse("donor_forget_confirm", kwargs={"uidb64": uid, "token": token})
+        )
+
+        # Send email
+        subject = "BloodLink Password Reset"
+        message = f"Hi {donor.first_name},\n\nPlease click the link below to reset your password:\n{reset_url}\n\nIf you didn't request this, please ignore this email."
+        from_email = settings.DEFAULT_FROM_EMAIL
+        send_mail(subject, message, from_email, [donor.email])
+
+        return redirect("donor_forget_done")
+
+    return render(request, "donor_forget_request.html")
+
+
+def donor_forget_done(request):
+    return render(request, "donor_forget_done.html")
+
+def donor_forget_confirm(request, uidb64, token):
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        donor = Donor.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, Donor.DoesNotExist):
+        donor = None
+
+    if donor is not None and donor_password_reset_token.check_token(donor, token):
+        if request.method == 'POST':
+            password1 = request.POST.get('password1')
+            password2 = request.POST.get('password2')
+            if password1 and password1 == password2:
+                donor.set_password(password1)
+                donor.save()
+                messages.success(request, 'Password has been reset successfully.')
+                return redirect('donor_login')
+            else:
+                messages.error(request, "Passwords do not match.")
+        return render(request, 'donor_forget_confirm.html', {'validlink': True, 'donor': donor})
+    else:
+        messages.error(request, 'The reset link is invalid or has expired.')
+        return render(request, 'donor_forget_confirm.html', {'validlink': False})
+
+# =============== for collector =======================================================
+# bload_donor_app/views.py
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.core.mail import send_mail
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes
+from django.urls import reverse
+from .models import Collector
+from .tokens import collector_password_reset_token
+from django.conf import settings
+
+def collector_forget_request(request):
+    if request.method == "POST":
+        email = request.POST.get('email')
+        if email:
+            try:
+                collector = Collector.objects.get(email=email)
+            except Collector.DoesNotExist:
+                collector = None
+
+            if collector:
+                token = collector_password_reset_token.make_token(collector)
+                uid = urlsafe_base64_encode(force_bytes(collector.pk))
+                reset_url = settings.SITE_URL + reverse('collector_forget_confirm', kwargs={'uidb64': uid, 'token': token})
+
+                subject = "Reset your blood link Collector Portal password"
+                message = f"""
+Dear {collector.contact_person},
+
+You requested a password reset for your blood link Collector Portal account.
+
+Please click the link below to set a new password:
+{reset_url}
+
+If you did not request this, please ignore this email.
+
+Thank you,
+Blood Link
+"""
+
+                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [collector.email], fail_silently=False)
+
+                messages.success(request, "Password reset email sent. Please check your inbox.")
+                return redirect('collector_login')
+
+            else:
+                messages.error(request, "No collector account found with that email.")
+        else:
+            messages.error(request, "Please enter a valid email address.")
+    return render(request, 'collector_forget_request.html')
+
+
+def collector_forget_confirm(request, uidb64, token):
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        collector = Collector.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, Collector.DoesNotExist):
+        collector = None
+
+    if collector is not None and collector_password_reset_token.check_token(collector, token):
+        if request.method == 'POST':
+            password = request.POST.get('password1')
+            password_confirm = request.POST.get('password2')
+            if password and password == password_confirm:
+                # Hash password manually
+                collector.password = make_password(password)
+                collector.save()
+                messages.success(request, 'Password has been reset successfully.')
+                return redirect('collector_login')
+            else:
+                messages.error(request, "Passwords do not match.")
+        return render(request, 'collector_forget_confirm.html', {'validlink': True, 'collector': collector})
+    else:
+        messages.error(request, 'The reset link is invalid or has expired.')
+        return render(request, 'collector_forget_confirm.html', {'validlink': False})

@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="password-reset-sent-container">
+    <style>
+        /* Define consistent color variables for this page */
+        :root {
+            --primary-red: #e74c3c;
+            --primary-blue: #2d3e50;
+            --text-dark: #2c3e50;
+            --text-light: #ffffff;
+            --gray-bg: #f5f5f5;
+            --border-gray: #ddd;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--gray-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Ensure it takes full viewport height for centering */
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: var(--text-dark);
+        }
+
+        .password-reset-sent-container {
+            background-color: var(--text-light); /* White background for the card */
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            max-width: 500px; /* Max width for readability */
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center; /* Center content within the container */
+        }
+
+        .password-reset-sent-container h2 {
+            font-size: 30px;
+            color: var(--primary-blue);
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .password-reset-sent-container p {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px; /* Space between paragraphs */
+        }
+
+        .password-reset-sent-container p:last-of-type {
+            margin-bottom: 30px; /* More space before the button */
+        }
+
+        .password-reset-sent-container a {
+            background-color: var(--primary-red);
+            color: var(--text-light);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none; /* Remove underline from link */
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            display: inline-block; /* Allows padding and transformation */
+        }
+
+        .password-reset-sent-container a:hover {
+            background-color: var(--secondary); /* Darker red on hover */
+            transform: translateY(-2px); /* Slight lift */
+        }
+
+        .password-reset-sent-container a:active {
+            transform: translateY(0); /* Press effect */
+        }
+
+        /* Media Queries for Responsiveness */
+        @media (max-width: 600px) {
+            .password-reset-sent-container {
+                padding: 30px 25px;
+                margin: 15px; /* Add some margin on very small screens */
+            }
+            .password-reset-sent-container h2 {
+                font-size: 26px;
+            }
+            .password-reset-sent-container p {
+                font-size: 15px;
+                margin-bottom: 15px;
+            }
+            .password-reset-sent-container p:last-of-type {
+                margin-bottom: 25px;
+            }
+            .password-reset-sent-container a {
+                padding: 10px 20px;
+                font-size: 15px;
+            }
+        }
+    </style>
+
+    <h2>Password Reset Email Sent</h2>
+    <p>If an account with the email you entered exists, a password reset link has been sent.</p>
+    <p>Please check your email inbox and follow the instructions.</p>
+    <a href="{% url 'donor_login' %}">Back to Login</a>
+</div>
+{% endblock %}

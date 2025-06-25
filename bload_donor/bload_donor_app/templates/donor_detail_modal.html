@@ -1,0 +1,7 @@
+<!-- donor_detail_modal.html -->
+<h3>{{ donor.full_name }}</h3>
+<p><strong>Blood Type:</strong> {{ donor.blood_type }}</p>
+<p><strong>Email:</strong> {{ donor.email }}</p>
+<p><strong>Phone:</strong> {{ donor.phone }}</p>
+<p><strong>Last Donation:</strong> {{ donor.last_donation_date|default:"N/A" }}</p>
+<button onclick="hideModal('donorDetailModal')">Close</button>

@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views 
+from .tokens import donor_password_reset_token
 
 urlpatterns = [
     # Homepage and role selection
@@ -39,7 +40,7 @@ urlpatterns = [
     path('Profile/', views.Profile, name='Profile'),
 
     # Settings pages
-    path('settings_donor/', views.settings, name='settings'),
+    path('settings_donor/', views.settingsdonor, name='settings'),
     path('settings_collector/', views.settingscolle, name='settingscolle'),
 
     # Password reset endpoints
@@ -56,11 +57,23 @@ urlpatterns = [
     path('collector/reports/export/pdf/', views.export_report_pdf, name='export_report_pdf'),
 
     # ==========================for resetting the donor password using forget password option==============
-    path('donor/forgot-password/', views.donor_forget_reset, name='donor_forget_reset'),
-    path('donor/reset-password/<str:token>/', views.reset_donor_password, name='reset_donor_password'),
-    #============================ testmonial =============================
+    # path('donor/forgot-password/', views.donor_forget_reset, name='donor_forget_reset'),
+    # path('donor/reset-password/<str:token>/', views.reset_donor_password, name='reset_donor_password'),
+    #============================ testmonial ================================================
     path('submit-testimonial/', views.submit_testimonial, name='submit_testimonial'),
     path('testimonial-thanks/', views.testimonial_thanks, name='testimonial_thanks'),
+    #================donor additional details as per collect dashboard=================
+    path('collector/donor/<int:donor_id>/', views.donor_detail_view, name='donor_detail'),
+    path('collector/donor/<int:donor_id>/send-message/', views.send_message_form, name='send_message'),
+
+    # ==============================donor forget passwor final========================================
+    path('donor-forget-password/', views.donor_forget_request, name='donor_forget_request'),
+    path('donor-forget-password/done/', views.donor_forget_done, name='donor_forget_done'),
+    path('donor-forget-password-confirm/<uidb64>/<token>/', views.donor_forget_confirm, name='donor_forget_confirm'),
+
+    #=====================coleector forget password final ===================================
+    path('collector-forget-password/', views.collector_forget_request, name='collector_forget_request'),
+    path('collector-forget-password-confirm/<uidb64>/<token>/', views.collector_forget_confirm, name='collector_forget_confirm'),
 ]
 
 

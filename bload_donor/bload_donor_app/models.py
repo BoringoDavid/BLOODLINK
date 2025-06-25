@@ -39,6 +39,7 @@ class Donor(models.Model):
     province = models.CharField(max_length=100)
     district = models.CharField(max_length=100)
     sector = models.CharField(max_length=100)
+    
 
     # Optional/Extra Information
     donation_time = models.CharField(max_length=10)
@@ -49,6 +50,7 @@ class Donor(models.Model):
     # System Credentials
     username = models.CharField(max_length=150, unique=True, null=False, blank=False)
     password = models.CharField(max_length=255, null=True, blank=True)
+    last_login = models.DateTimeField(null=True, blank=True)
 
     #for forgetting the password
     reset_token = models.CharField(max_length=64, blank=True, null=True)
@@ -80,6 +82,8 @@ class Donor(models.Model):
 
     def check_password(self, raw_password):
         return check_password(raw_password, self.password)
+    def get_email_field_name(self):
+        return 'email'  # The field name in your model that stores email
 
     def __str__(self):
         return f"{self.full_name} ({self.blood_type})"
@@ -230,7 +234,6 @@ class DonationAppointment(models.Model):
      return f"{self.donor} on {self.appointment_date} at {self.selected_center}"
     
 #================================= end of donation appointment model ======================================
-
 
 # ====================================Testimonial==========================================================
 # models.py

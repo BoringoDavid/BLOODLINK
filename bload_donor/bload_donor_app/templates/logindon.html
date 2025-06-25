@@ -1,137 +1,150 @@
 {% extends 'base.html' %}
-{% load static%}
+{% load static %}
+{% comment %} {% load crispy_forms_tags %}  {# if you use crispy forms or similar, remove if not #} {% endcomment %}
 
-
-{% block title %}BLOODLINK - Login {% endblock %}  
+{% block title %}BLOODLINK - Login {% endblock %}
 
 {% block content %}
-         
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        {% comment %} <title>BLOODLINK - Login</title> {% endcomment %}
-        <link rel="stylesheet" href="{% static 'css/logindonor.css' %}">
-        
-    </head>
-    <body>
-        <div id="loginModal" class="modal">
-            <div class="modal-content">
-                <span class="close-modal" id="closeLogin">&times;</span>
 
-                <div class="logo-container">
-                    <a href="#" class="logo">
-                        <span class="blood-drop">💉</span>Blood<span>Link</span>
-                    </a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="{% static 'css/logindonor.css' %}" />
+</head>
+<body>
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeLogin">&times;</span>
+
+            <div class="logo-container">
+                <a href="#" class="logo">
+                    <span class="blood-drop">💉</span>Blood<span>Link</span>
+                </a>
+            </div>
+
+            <h2>Welcome Back</h2>
+
+            {# Show Django messages for success or errors (login or reset) #}
+            {% if messages %}
+                <div class="general-error" id="generalError">
+                    {% for message in messages %}
+                        <p class="{{ message.tags }}">{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form class="login-form" id="loginForm" method="POST" action="{% url 'donor_login' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="Enter your username"
+                        required
+                    />
                 </div>
 
-                <h2>Welcome Back</h2>
-
-                    {% if messages %}
-                        <div class="general-error" id="generalError">
-                            {% for message in messages %}
-                                <p class="{{ message.tags }}">{{ message }}</p>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-
-                <form class="login-form" id="loginForm" method="POST" action="{% url 'donor_login' %}">
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" id="username" name="username" placeholder="Enter your username" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" id="password" name="password" placeholder="Enter your password" required>
-                    </div>
-
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                        <div class="remember-me">
-                            <input type="checkbox" id="remember" name="remember">
-                            <label for="remember">Remember me</label>
-                        </div>
-                        <div class="forgot-password">
-                            <a href="{% url 'donor_forget_reset' %}">Forgot Password?</a>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="login-button" id="loginBtn">
-                        <span id="btnText">Log In</span>
-                    </button>
-
-                    <div class="signup-link">
-                        Don't have an account? <a href="{% url 'register_donor' %}">Sign Up</a>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Password Reset Modal -->
-        <div id="passwordResetModal" class="password-reset-modal">
-            <div class="password-reset-content">
-                <span class="close-modal" id="closeReset">&times;</span>
-                
-                <div class="logo-container">
-                    <a href="#" class="logo">
-                        <span class="blood-drop">💉</span>Blood<span>Link</span>
-                    </a>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        required
+                    />
                 </div>
 
-                <h2>Reset Password</h2>
-                
-                <form id="resetForm">
-                    <div class="form-group">
-                        <label for="resetEmail">Email Address</label>
-                        <input type="email" id="resetEmail" name="resetEmail" placeholder="Enter your email address" required>
+                <div
+                    style="
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 1.5rem;
+                    "
+                >
+                    <div class="remember-me">
+                        <input type="checkbox" id="remember" name="remember" />
+                        <label for="remember">Remember me</label>
                     </div>
-
-                    <button type="submit" class="login-button" id="resetBtn">
-                        <span id="resetBtnText">Send Reset Link</span>
-                    </button>
-
-                    <div class="reset-success" id="resetSuccess" style="display: none;">
-                        <i>✅</i> Password reset link has been sent to your email address. Please check your inbox.
+                    <div class="forgot-password">
+                        <a href="#" id="showResetModal">Forgot Password?</a>
                     </div>
-                </form>
-            </div>
+                </div>
+
+                <button type="submit" class="login-button" id="loginBtn">
+                    <span id="btnText">Log In</span>
+                </button>
+
+                <div class="signup-link">
+                    Don't have an account? <a href="{% url 'register_donor' %}">Sign Up</a>
+                </div>
+            </form>
         </div>
+    </div>
 
-        <script>
-            // Close modal and go to index page
-            document.getElementById('closeLogin').onclick = function () {
-                window.location.href = "{% url 'index' %}";
-            };
+    <!-- Password Reset Modal -->
+    <div id="passwordResetModal" class="password-reset-modal" style="display:none;">
+        <div class="password-reset-content">
+            <span class="close-modal" id="closeReset">&times;</span>
 
-            // Close password reset modal
-            document.getElementById('closeReset').onclick = function () {
-                document.getElementById('passwordResetModal').style.display = 'none';
-                document.getElementById('loginModal').style.display = 'flex';
-            };
+            <div class="logo-container">
+                <a href="#" class="logo">
+                    <span class="blood-drop">💉</span>Blood<span>Link</span>
+                </a>
+            </div>
 
-            // Show password reset modal
-            document.querySelector('.forgot-password a').onclick = function (e) {
-                e.preventDefault();
-                document.getElementById('loginModal').style.display = 'none';
-                document.getElementById('passwordResetModal').style.display = 'flex';
-            };
+            <h2>Reset Password</h2>
 
-            // Fake password reset success
-            document.getElementById('resetForm').onsubmit = function (e) {
-                e.preventDefault();
-                document.getElementById('resetSuccess').style.display = 'block';
-                setTimeout(() => {
-                    document.getElementById('passwordResetModal').style.display = 'none';
-                    document.getElementById('loginModal').style.display = 'flex';
-                    document.getElementById('resetForm').reset();
-                    document.getElementById('resetSuccess').style.display = 'none';
-                }, 3000);
-            };
+            <form
+                id="resetForm"
+                method="POST"
+                action="{% url 'donor_forget_request' %}"
+                novalidate
+            >
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="resetEmail">Email Address</label>
+                    <input
+                        type="email"
+                        id="resetEmail"
+                        name="email"
+                        placeholder="Enter your email address"
+                        required
+                    />
+                </div>
 
-        </script>
-    </body>
+                <button type="submit" class="login-button" id="resetBtn">
+                    <span id="resetBtnText">Send Reset Link</span>
+                </button>
+            </form>
+        </div>
+    </div>
 
-    </html>
-{% endblock%}
+    <script>
+        // Close login modal and redirect to index
+        document.getElementById('closeLogin').onclick = function () {
+            window.location.href = "{% url 'index' %}";
+        };
+
+        // Show password reset modal on clicking forgot password link
+        document.getElementById('showResetModal').onclick = function (e) {
+            e.preventDefault();
+            document.getElementById('loginModal').style.display = 'none';
+            document.getElementById('passwordResetModal').style.display = 'flex';
+        };
+
+        // Close password reset modal and return to login modal
+        document.getElementById('closeReset').onclick = function () {
+            document.getElementById('passwordResetModal').style.display = 'none';
+            document.getElementById('loginModal').style.display = 'flex';
+        };
+    </script>
+</body>
+</html>
+
+{% endblock %}

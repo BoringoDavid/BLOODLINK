@@ -56,7 +56,9 @@
             <button type="submit" class="login-button">Access RBC Portal</button>
             
             <div class="forgot-password">
-                <a href="#" id="resetPassword">Forgot password or need new credentials?</a>
+                {% comment %} <a href="#" id="resetPassword">Forgot password or need new credentials?</a> {% endcomment %}
+                <a href="{% url 'collector_forget_request' %}">Forgot password or need new credentials?</a>
+
             </div>
         </form>
         
