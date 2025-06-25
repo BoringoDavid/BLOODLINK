@@ -51,6 +51,7 @@ class Donor(models.Model):
     username = models.CharField(max_length=150, unique=True, null=False, blank=False)
     password = models.CharField(max_length=255, null=True, blank=True)
     last_login = models.DateTimeField(null=True, blank=True)
+    reminder_sent = models.BooleanField(default=False)
 
     #for forgetting the password
     reset_token = models.CharField(max_length=64, blank=True, null=True)

@@ -40,6 +40,7 @@ from .models import Donor
 from django.conf import settings 
 from functools import wraps
 from .tokens import donor_password_reset_token 
+import pandas as pd
 
 # handling the loggin sessions using custom user 
 
@@ -653,18 +654,22 @@ def collector(request):
     )
 
     for drive in upcoming_drives:
-        appointments = drive.donationappointment_set.all()
-        for appointment in appointments:
-            donor = appointment.donor
-            if donor.email:
-                subject = "Reminder: Upcoming Blood Donation Drive for your appointment"
-                collector_location = f"{drive.collector.facility_name}, {drive.collector.district}, {drive.collector.province}"
-                message = (
-                    f"Dear {donor.first_name},\n\n"
-                    f"This is a reminder that you have registered to donate blood on {drive.date} at {collector_location}.\n\n"
-                    "Please be on time and bring your ID.\n\nThank you for saving lives!"
-                )
-                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [donor.email], fail_silently=True)
+        appointments = drive.donationappointment_set.filter(reminder_sent=False)
+    for appointment in appointments:
+        donor = appointment.donor
+        if donor.email:
+            subject = "Reminder: Upcoming Blood Donation Drive for your appointment"
+            collector_location = f"{drive.collector.facility_name}, {drive.collector.district}, {drive.collector.province}"
+            message = (
+                f"Dear {donor.first_name},\n\n"
+                f"This is a reminder that you have registered to donate blood on {drive.date} at {collector_location}.\n\n"
+                "Please be on time and bring your ID.\n\nThank you for saving lives!"
+            )
+            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [donor.email], fail_silently=True)
+
+            # ✅ Mark as sent
+            appointment.reminder_sent = True
+            appointment.save()
 
     # Show only future active drives (date > today and is_active)
     drives = DonationDrive.objects.filter(
