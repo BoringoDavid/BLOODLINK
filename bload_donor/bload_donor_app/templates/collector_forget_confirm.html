@@ -3,30 +3,241 @@
 
 {% block content %}
 <div class="password-set-container">
-    {% if validlink %}
-        <h2>Set New Password</h2>
-        <form method="POST">
-            {% csrf_token %}
-            <label for="password1">New Password</label>
-            <input type="password" name="password1" id="password1" required>
+    <style>
+        /* Define consistent color variables for this page */
+        :root {
+            --primary-red: #e74c3c;
+            --secondary-red: #c0392b;
+            --primary-blue: #2d3e50;
+            --text-dark: #2c3e50;
+            --text-light: #ffffff;
+            --gray-bg: #f5f5f5;
+            --border-gray: #ddd;
+            --success-color: #27ae60;
+            --error-color: #e74c3c; /* Using primary-red for error messages */
+            --info-color: #3498db;
+            --warning-color: #f1c40f;
+        }
 
-            <label for="password2">Confirm New Password</label>
-            <input type="password" name="password2" id="password2" required>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--gray-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: var(--text-dark);
+        }
 
-            <button type="submit">Reset Password</button>
-        </form>
-    {% else %}
-        <h2>Password reset link invalid</h2>
-        <p>The password reset link is invalid or has expired. Please request a new link.</p>
-        <a href="{% url 'collector_forget_request' %}">Request new password reset</a>
-    {% endif %}
+        .password-set-container {
+            background-color: var(--text-light); /* White background for the card */
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            max-width: 500px; /* Max width for readability */
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center; /* Center content within the container */
+        }
 
-    {% if messages %}
-    <ul>
-        {% for message in messages %}
-        <li class="{{ message.tags }}">{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-</div>
+        .password-set-container h2 {
+            font-size: 30px;
+            color: var(--primary-blue);
+            margin-bottom: 30px; /* Space below heading */
+            font-weight: 700;
+        }
+
+        .password-set-container p {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 25px; /* Space below paragraphs */
+        }
+
+        .password-set-container form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px; /* Space between form elements */
+            align-items: stretch; /* Stretch items to fill container width */
+        }
+
+        .password-set-container label {
+            display: block; /* Make label take full width */
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 16px;
+            text-align: left; /* Align labels to the left */
+        }
+
+        .password-set-container input[type="password"] {
+            width: 100%; /* Ensure full width */
+            padding: 15px 20px;
+            border: 1px solid var(--border-gray);
+            border-radius: 8px;
+            font-size: 16px;
+            color: var(--text-dark);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            box-sizing: border-box; /* Include padding in width */
+            margin-bottom: 10px; /* Space after input, before next label/button */
+        }
+
+        .password-set-container input[type="password"]:focus {
+            border-color: var(--primary-red);
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2);
+            outline: none;
+        }
+
+        .password-set-container button[type="submit"] {
+            background-color: var(--primary-red);
+            color: var(--text-light);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            width: 100%; /* Full width button */
+            box-sizing: border-box;
+            margin-top: 10px; /* Space above the button */
+        }
+
+        .password-set-container button[type="submit"]:hover {
+            background-color: var(--secondary-red);
+            transform: translateY(-2px);
+        }
+
+        .password-set-container button[type="submit"]:active {
+            transform: translateY(0);
+        }
+
+        /* Link (Request new password reset) style */
+        .password-set-container a {
+            background-color: var(--primary-blue); /* Use primary blue for this action link */
+            color: var(--text-light);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none; /* Remove underline */
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            display: inline-block; /* Allows padding and transformation */
+            margin-top: 20px; /* Space above the button */
+        }
+
+        .password-set-container a:hover {
+            background-color: #243343; /* Slightly darker blue on hover */
+            transform: translateY(-2px);
+        }
+
+        .password-set-container a:active {
+            transform: translateY(0);
+        }
+
+        /* Message styling */
+        .password-set-container ul {
+            list-style: none; /* Remove bullet points */
+            padding: 0;
+            margin-top: 25px;
+        }
+
+        .password-set-container ul li {
+            padding: 12px 20px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            text-align: left;
+            opacity: 0.9;
+        }
+
+        /* Specific message types (Django's message tags) */
+        .password-set-container ul li.success {
+            background-color: rgba(39, 174, 96, 0.1); /* Light green background */
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+        }
+
+        .password-set-container ul li.error {
+            background-color: rgba(231, 76, 60, 0.1); /* Light red background */
+            color: var(--error-color);
+            border: 1px solid var(--error-color);
+        }
+
+        .password-set-container ul li.info {
+            background-color: rgba(52, 152, 219, 0.1); /* Light blue background */
+            color: var(--info-color);
+            border: 1px solid var(--info-color);
+        }
+
+        .password-set-container ul li.warning {
+            background-color: rgba(241, 196, 15, 0.1); /* Light yellow background */
+            color: var(--warning-color);
+            border: 1px solid var(--warning-color);
+        }
+
+        /* Media Queries for Responsiveness */
+        @media (max-width: 600px) {
+            .password-set-container {
+                padding: 30px 25px;
+                margin: 15px;
+            }
+            .password-set-container h2 {
+                font-size: 26px;
+                margin-bottom: 20px;
+            }
+            .password-set-container p {
+                font-size: 15px;
+                margin-bottom: 20px;
+            }
+            .password-set-container label {
+                font-size: 15px;
+                margin-bottom: 5px;
+            }
+            .password-set-container input[type="password"],
+            .password-set-container button[type="submit"],
+            .password-set-container a {
+                padding: 12px 15px;
+                font-size: 16px;
+            }
+            .password-set-container ul li {
+                font-size: 14px;
+                padding: 10px 15px;
+            }
+        }
+    </style>
+
+    <div class="password-set-container">
+        {% if validlink %}
+            <h2>Set New Password</h2>
+            <form method="POST">
+                {% csrf_token %}
+                <label for="password1">New Password</label>
+                <input type="password" name="password1" id="password1" required>
+
+                <label for="password2">Confirm New Password</label>
+                <input type="password" name="password2" id="password2" required>
+
+                <button type="submit">Reset Password</button>
+            </form>
+        {% else %}
+            <h2>Password Reset Link Invalid</h2>
+            <p>The password reset link is invalid or has expired. Please request a new link.</p>
+            <a href="{% url 'collector_forget_request' %}">Request New Password Reset</a>
+        {% endif %}
+
+        {% if messages %}
+        <ul>
+            {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
 {% endblock %}
